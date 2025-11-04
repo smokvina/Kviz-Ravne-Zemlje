@@ -1,0 +1,81 @@
+<div class="w-full max-w-3xl mx-auto">
+  @switch (quizState()) {
+    @case ('start') {
+      <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center animate-fade-in">
+        <h1 class="text-4xl font-bold text-cyan-400 mb-4">Kviz: Dokazi o Ravnoj Zemlji</h1>
+        <p class="text-slate-300 mb-8 text-lg">Testirajte svoje znanje o 200 dokaza da Zemlja nije rotirajuća lopta. Za svaki točan odgovor, otkrit ćete originalni dokaz iz teksta.</p>
+        <button (click)="startQuiz()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+          Započni Kviz
+        </button>
+      </div>
+    }
+    @case ('playing') {
+      <div class="relative bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full">
+        @if (currentQuestion(); as question) {
+          <div class="animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+              <span class="text-sm font-semibold text-cyan-400">Pitanje {{ currentQuestionIndex() + 1 }} / {{ questions().length }}</span>
+              <span class="text-sm font-semibold text-slate-300">Rezultat: {{ score() }}</span>
+            </div>
+            
+            <h2 class="text-xl sm:text-2xl font-semibold mb-6 text-slate-100">... {{ question.questionText }}</h2>
+            
+            <div class="space-y-4">
+              @for (option of question.options; track option) {
+                <button 
+                  (click)="selectAnswer(option)"
+                  [class]="getButtonClass(option)"
+                  [disabled]="selectedAnswer() !== null"
+                  class="w-full text-left p-4 rounded-lg transition-all duration-300 text-slate-50 text-base">
+                  {{ option }}
+                </button>
+              }
+            </div>
+
+            @if (selectedAnswer() !== null) {
+              <div class="mt-8 text-right animate-fade-in">
+                <button (click)="nextQuestion()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg transition-transform transform hover:scale-105">
+                  Sljedeće Pitanje
+                </button>
+              </div>
+            }
+          </div>
+        } @else {
+          <p class="text-center text-slate-400">Učitavanje pitanja...</p>
+        }
+        
+        @if (showEvidence()) {
+          <div class="absolute inset-0 bg-black bg-opacity-70 flex items-center justify-center p-4 z-10 animate-fade-in">
+            <div class="bg-slate-900 border border-cyan-500 rounded-2xl p-6 max-w-xl w-full shadow-lg max-h-[80vh] overflow-y-auto">
+              <h3 class="text-2xl font-bold text-cyan-400 mb-4">Dokaz iz Izvora</h3>
+              <p class="text-slate-300 whitespace-pre-wrap">{{ currentQuestion()?.evidence }}</p>
+              <div class="text-right mt-6">
+                 <button (click)="nextQuestion()" class="bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-2 px-6 rounded-lg">
+                  Nastavi
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+    }
+    @case ('finished') {
+      <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl text-center animate-fade-in">
+        <h2 class="text-4xl font-bold text-cyan-400 mb-4">Kviz Završen!</h2>
+        <p class="text-2xl text-slate-200 mb-2">Vaš konačni rezultat je:</p>
+        <p class="text-6xl font-extrabold text-white my-4">{{ score() }} / {{ questions().length }}</p>
+        @if (score() === questions().length) {
+          <p class="text-green-400 font-semibold text-lg">Čestitamo! Svi odgovori su točni!</p>
+        } @else if (score() > questions().length / 2) {
+           <p class="text-yellow-400 font-semibold text-lg">Odličan posao! Znate većinu dokaza.</p>
+        } @else {
+           <p class="text-red-400 font-semibold text-lg">Ima još prostora za učenje. Pokušajte ponovno!</p>
+        }
+        <button (click)="startQuiz()" class="mt-8 bg-cyan-500 hover:bg-cyan-600 text-white font-bold py-3 px-8 rounded-lg text-xl transition-transform transform hover:scale-105">
+          Igraj Ponovno
+        </button>
+      </div>
+    }
+  }
+</div>
